@@ -19,20 +19,25 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [sheetTitle, setSheetTitle] = useState("");
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL,
+    withCredentials: true,
+  });
+
   useEffect(() => {
-    axios
-      .get("http://localhost:5001/auth/user", { withCredentials: true })
+    api
+      .get("/auth/user", { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
-  }, []);
+  }, [api]);
 
   const handleLogin = () => {
     window.location.href = "http://localhost:5001/auth/google";
   };
 
   const handleLogout = () => {
-    axios
-      .get("http://localhost:5001/auth/logout", { withCredentials: true })
+    api
+      .get("/auth/logout", { withCredentials: true })
       .then(() => {
         setUser(null);
         setSheetUrl("");
@@ -53,8 +58,8 @@ function App() {
   const handleCreateSheet = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:5001/create-sheet",
+      const res = await api.post(
+        "/create-sheet",
         { title: sheetTitle, tabs },
         { withCredentials: true }
       );
