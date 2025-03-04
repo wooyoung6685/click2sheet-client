@@ -32,7 +32,7 @@ function App() {
   }, [api]);
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:5001/auth/google";
+    window.location.href = `${api.defaults.baseURL}/auth/google`;
   };
 
   const handleLogout = () => {
