@@ -29,7 +29,7 @@ function App() {
       .get("/auth/user", { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
-  }, [api]);
+  }, []);
 
   const handleLogin = () => {
     window.location.href = `${api.defaults.baseURL}/auth/google`;
