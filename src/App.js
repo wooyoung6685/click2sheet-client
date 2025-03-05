@@ -29,6 +29,7 @@ function App() {
       .get("/auth/user", { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = () => {
@@ -133,7 +134,13 @@ function App() {
           )}
 
           <ButtonGroup>
-            <Button onClick={handleCreateSheet}>시트 생성</Button>
+            {sheetTitle ? (
+              <Button onClick={handleCreateSheet}>시트 생성</Button>
+            ) : (
+              <Button disabled onClick={handleCreateSheet}>
+                시트 생성
+              </Button>
+            )}
             <Button onClick={handleLogout}>로그아웃</Button>
           </ButtonGroup>
         </>
