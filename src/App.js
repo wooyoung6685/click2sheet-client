@@ -19,26 +19,17 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [sheetTitle, setSheetTitle] = useState("");
 
-  // Axios 인스턴스 생성 (토큰 포함)
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL,
     withCredentials: true,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
   });
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/auth/user");
-        setUser(res.data.user);
-      } catch (error) {
-        setUser(null);
-      }
-    };
-
-    fetchUser();
+    api
+      .get("/auth/user", { withCredentials: true })
+      .then((res) => setUser(res.data.user))
+      .catch(() => setUser(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = () => {
@@ -46,9 +37,13 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // 토큰 삭제
-    setUser(null);
-    setSheetUrl("");
+    api
+      .get("/auth/logout", { withCredentials: true })
+      .then(() => {
+        setUser(null);
+        setSheetUrl("");
+      })
+      .catch((err) => console.error("Logout error:", err));
   };
 
   const addTab = (tabName) => {
@@ -62,13 +57,13 @@ function App() {
   };
 
   const handleCreateSheet = async () => {
-    if (!user) return alert("로그인이 필요합니다!");
     setLoading(true);
     try {
-      const res = await api.post("/create-sheet", {
-        title: sheetTitle,
-        tabs,
-      });
+      const res = await api.post(
+        "/create-sheet",
+        { title: sheetTitle, tabs },
+        { withCredentials: true }
+      );
       setSheetUrl(res.data.url);
     } catch (error) {
       console.error("Error creating sheet:", error);
@@ -82,7 +77,7 @@ function App() {
       <h2>Google Sheets 생성기</h2>
       {user ? (
         <>
-          <p>{user.name}님, 복사할 시트 탭을 선택하고 제목을 입력하세요.</p>
+          <p>복사할 시트 탭을 선택하고, 제목을 입력하세요.</p>
           <input
             type="text"
             placeholder="시트 제목을 입력하세요"
@@ -131,6 +126,7 @@ function App() {
             </TabList>
           )}
 
+          {/* 시트 생성 중 로딩바 */}
           {loading && (
             <LoadingBarWrapper>
               <LoadingBar />
@@ -138,9 +134,13 @@ function App() {
           )}
 
           <ButtonGroup>
-            <Button onClick={handleCreateSheet} disabled={!sheetTitle}>
-              시트 생성
-            </Button>
+            {sheetTitle ? (
+              <Button onClick={handleCreateSheet}>시트 생성</Button>
+            ) : (
+              <Button disabled onClick={handleCreateSheet}>
+                시트 생성
+              </Button>
+            )}
             <Button onClick={handleLogout}>로그아웃</Button>
           </ButtonGroup>
         </>
