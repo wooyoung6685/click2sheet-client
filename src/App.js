@@ -27,7 +27,7 @@ function App() {
   useEffect(() => {
     api
       .get("/auth/user", { withCredentials: true })
-      .then((res) => setUser(res.data.user))
+      .then((res) => setUser(res.data))
       .catch(() => setUser(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -38,12 +38,15 @@ function App() {
 
   const handleLogout = () => {
     api
-      .get("/auth/logout", { withCredentials: true })
+      .post("/auth/logout", {}, { withCredentials: true }) // POST 요청으로 로그아웃 처리
       .then(() => {
         setUser(null);
         setSheetUrl("");
       })
-      .catch((err) => console.error("Logout error:", err));
+      .catch((err) => {
+        console.error("로그아웃 에러:", err);
+        alert("로그아웃 실패. 다시 시도해 주세요.");
+      });
   };
 
   const addTab = (tabName) => {
